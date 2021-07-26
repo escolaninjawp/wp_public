@@ -54,15 +54,12 @@ function fluxo_cobranca(){
         if ($total_cobrancas_ja_feitas < $qts_cobras) {
 
             $dados_cliente = get_field('cliente', $post_id);
-
-			echo $post_id;
-			print_r($dados_cliente);
-
+			
+			//Recupera o ID do cliente
 			$id_cliente = $dados_cliente['ID'];
 
 
-			$whats_cliente = get_field('numero_de_whatsapp', 'user_'.$id_cliente);
-			echo $whats_cliente;
+			//$whats_cliente = get_field('numero_de_whatsapp', 'user_'.$id_cliente);
 
 			//Recupera os dados do cliente
 			$nome = $dados_cliente['display_name'];
@@ -107,7 +104,6 @@ function fluxo_cobranca(){
             }
 
 
-			//$msg = "Olá *$nome*. \r\n\r\n Segue a cobrança agendada referente ao \r\n *$servico* \r\n \r\n a forma de pagamento é *$nome_pg* . o valor da prestação / Serviço é R$ *$preco_da_prestacao_servico* \r\n \r\n $msg_pg ";
 
 
 
@@ -134,24 +130,11 @@ function fluxo_cobranca(){
 
 				wp_mail( $email_cliente, "Fatura", $template);
 
-				/*
-			   //dispara a mensagem da API para o cliente
-			   $url = 'http://116.203.60.247:8000/send-message';
-			   $data1 = array('sender' => 'primary','number' => '55' . $whats_cliente, 'message' => $msg);
-			   // use key 'http' even if you send the request to https://...
-			   $options = array(
-			   'http' => array(
-				   'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				   'method'  => 'POST',
-				   'content' => http_build_query($data1),
-				   'timeout' => 10
-			   )
-		   );
-			   $context  = stream_context_create($options);
-			   $result = file_get_contents($url, false, $context);
+		
+			  
 
-			  // update_field('quantidade_cobrancas_feitas',$total_cobrancas_ja_feitas+1, $post_id);
-		   */
+			  update_field('quantidade_cobrancas_feitas',$total_cobrancas_ja_feitas+1, $post_id);
+		   
         }
 
 
