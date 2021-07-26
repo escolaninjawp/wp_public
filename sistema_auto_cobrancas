@@ -1,0 +1,161 @@
+// Para Formatar Emails em HTML
+function wpse27856_set_content_type(){
+    return "text/html";
+}
+add_filter( 'wp_mail_content_type','wpse27856_set_content_type' );
+
+
+// Função de fluxo de cobranças
+function fluxo_cobranca(){
+	
+	
+	$posts = get_posts(array(
+		'post_type'         => 'cobrancas',
+		'posts_per_page'    => -1,
+		'meta_query' => array(
+			'0' => array(
+				'key' => 'data_da_cobranca',
+				'value' => date('j'),//26
+				'compare' => '=',
+			),
+			'relation' => 'AND',
+		),
+		'orderby'           => 'meta_value',
+		'order'             => 'ASC'
+	));
+
+
+
+
+
+
+
+	foreach ($posts as $key => $value) {
+
+
+		$post_id = $value->ID;
+
+
+		//PARCELA = 2
+		$qts_cobras = get_field('quantas_cobrancas', $post_id);
+		
+		
+		//Cobranças já realizadas = 2
+		$total_cobrancas_ja_feitas = get_field('quantidade_cobrancas_feitas', $post_id);
+
+		if($qts_cobras == ""){
+			$qts_cobras = 0;
+		}
+		if($total_cobrancas_ja_feitas == ""){
+			$total_cobrancas_ja_feitas = 0;
+		}
+
+	
+        if ($total_cobrancas_ja_feitas < $qts_cobras) {
+
+            $dados_cliente = get_field('cliente', $post_id);
+
+			echo $post_id;
+			print_r($dados_cliente);
+
+			$id_cliente = $dados_cliente['ID'];
+
+
+			$whats_cliente = get_field('numero_de_whatsapp', 'user_'.$id_cliente);
+			echo $whats_cliente;
+
+			//Recupera os dados do cliente
+			$nome = $dados_cliente['display_name'];
+
+			// Email do cliente
+			$email_cliente = $dados_cliente['user_email'];
+
+
+			//Pega o serviço atual
+            $servico = get_field('servico', $post_id);
+
+			//pega o preço da prestação de serviço
+			$preco_da_prestacao_servico = get_field('preco_da_prestacao_servico', $post_id);
+			
+			
+			//Forma de pagamento
+            $forma_pagamento = get_field('forma_de_pagamento', $post_id);
+          
+			//Trata as formas de pagamento
+			if ($forma_pagamento == 0) {
+				$nome_pg = "Não especificado";
+                $pg = "Não especificado";
+            } elseif ($forma_pagamento == "B") {
+				$nome_pg = "Boleto Bancário";
+                $pg = get_field('boleto_bancario', $post_id);
+				$msg_pg = "Segue o link do pagamento via Boleto";
+            } elseif ($forma_pagamento == "P") {
+				$nome_pg = "PIX";
+                $pg = get_field("chave_pix", $post_id);
+				$msg_pg = "Segue nossa chave via PIX";
+
+            } elseif ($forma_pagamento == "CC") {
+				$nome_pg = "Cartão de Crédito";
+                $pg = "Cartão de Crédito";
+				$msg_pg = "";
+
+            } elseif ($forma_pagamento == "TF") {
+				$nome_pg = "Transferência Bancária";
+                $pg = "Transferência Bancária";
+				$msg_pg = "";
+
+            }
+
+
+			//$msg = "Olá *$nome*. \r\n\r\n Segue a cobrança agendada referente ao \r\n *$servico* \r\n \r\n a forma de pagamento é *$nome_pg* . o valor da prestação / Serviço é R$ *$preco_da_prestacao_servico* \r\n \r\n $msg_pg ";
+
+
+
+
+			//Configuro template de email
+			$variables = array();
+			$variables['cliente'] = $nome; // {{cliente}}
+			$variables['forma_pagamento'] = $nome_pg; //{{forma_pagamento}}
+			$variables['servico'] = $servico;
+			$variables['preco_servico'] = $preco_da_prestacao_servico;
+			$variables['msg_servico'] = $msg_pg;
+			$headers = array('Content-Type: text/html; charset=UTF-8');
+
+
+
+			//Recupera o template em HTML de email
+			$template = file_get_contents(get_template_directory() . "/email/template_email.html");
+			
+			
+				foreach($variables as $key => $value)
+				{
+					$template = str_replace('{{'.$key.'}}', $value, $template,$headers);
+				}
+
+				wp_mail( $email_cliente, "Fatura", $template);
+
+				/*
+			   //dispara a mensagem da API para o cliente
+			   $url = 'http://116.203.60.247:8000/send-message';
+			   $data1 = array('sender' => 'primary','number' => '55' . $whats_cliente, 'message' => $msg);
+			   // use key 'http' even if you send the request to https://...
+			   $options = array(
+			   'http' => array(
+				   'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+				   'method'  => 'POST',
+				   'content' => http_build_query($data1),
+				   'timeout' => 10
+			   )
+		   );
+			   $context  = stream_context_create($options);
+			   $result = file_get_contents($url, false, $context);
+
+			  // update_field('quantidade_cobrancas_feitas',$total_cobrancas_ja_feitas+1, $post_id);
+		   */
+        }
+
+
+
+	}
+}
+add_action('sistema_auto_cobrancas', 'fluxo_cobranca');
