@@ -1,0 +1,220 @@
+[
+    {
+        "key": "group_60f9c9f187b1f",
+        "title": "Cobranças",
+        "fields": [
+            {
+                "key": "field_60f9c9f538329",
+                "label": "Dia da Cobrança",
+                "name": "data_da_cobranca",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_60facf8f7f680",
+                "label": "Ciclo de cobranças (Quantas Parcelas?)",
+                "name": "quantas_cobrancas",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_60f9ca46a3dd6",
+                "label": "Cliente",
+                "name": "cliente",
+                "type": "user",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "role": "",
+                "allow_null": 0,
+                "multiple": 0,
+                "return_format": "array"
+            },
+            {
+                "key": "field_60f9ca5c180a4",
+                "label": "Mensagem Personalizada Sobre o serviço contratado",
+                "name": "servico",
+                "type": "textarea",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "maxlength": "",
+                "rows": "",
+                "new_lines": ""
+            },
+            {
+                "key": "field_60f9ca76e4628",
+                "label": "Forma de pagamento",
+                "name": "forma_de_pagamento",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "0": "Selecione",
+                    "B": "Boleto",
+                    "P": "Pix",
+                    "CC": "Cartão de Crédito",
+                    "TF": "Transferência Bancária"
+                },
+                "default_value": false,
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_60facc83efff5",
+                "label": "Quantidade Cobranças Feitas",
+                "name": "quantidade_cobrancas_feitas",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_60faccec42c46",
+                "label": "Boleto Bancário PDF",
+                "name": "boleto_bancario",
+                "type": "file",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_60f9ca76e4628",
+                            "operator": "==",
+                            "value": "B"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "url",
+                "library": "all",
+                "min_size": "",
+                "max_size": "",
+                "mime_types": ""
+            },
+            {
+                "key": "field_60facd59cb719",
+                "label": "Chave PIX",
+                "name": "chave_pix",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_60f9ca76e4628",
+                            "operator": "==",
+                            "value": "P"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_60fade10fa753",
+                "label": "Preço da Prestação \/ Serviço",
+                "name": "preco_da_prestacao_servico",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "R$",
+                "append": "",
+                "maxlength": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "cobrancas"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    }
+]
