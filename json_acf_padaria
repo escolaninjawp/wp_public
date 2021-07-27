@@ -213,3 +213,94 @@
         "description": ""
     }
 ]
+
+[
+    {
+        "key": "group_60f45acb29000",
+        "title": "whatsapp API",
+        "fields": [
+            {
+                "key": "field_60f45ad6ec2a8",
+                "label": "Autorizacao para Enviar Ofertas no WhatsApp",
+                "name": "auth_whatsapp_ofertas",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_60f55644ca182",
+                "label": "Número de Whatsapp",
+                "name": "numero_de_whatsapp",
+                "type": "text",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_61001bd52e032",
+                "label": "Produto",
+                "name": "produto",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "pao_frances": "Pão Francês",
+                    "pao_doce": "Pão doce Comum",
+                    "pao_queijo": "Pão de Queijo",
+                    "mini_pizza": "Mini Pizza"
+                },
+                "default_value": false,
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "user_form",
+                    "operator": "==",
+                    "value": "all"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    }
+]
