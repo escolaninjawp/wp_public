@@ -1,0 +1,105 @@
+
+
+
+//Função principal que vai fazer a consulta no banco de dados para saber qual produto enviar.
+
+function pedidos_padaria(){
+
+
+
+	$posts = get_posts(array(
+		'post_type'         => 'padaria',
+		'posts_per_page'    => -1,
+		'meta_query' => array(
+			'0' => array(
+				'key' => 'horario_1',
+				'value' => '11:33:00',//26
+				'compare' => '=',
+			),
+			'relation' => 'AND',
+		),
+		'orderby'           => 'meta_value',
+		'order'             => 'ASC'
+	));
+
+	foreach ($posts as $key => $value) {
+		$post_id = $value->ID;
+
+
+		$produto = get_field('produto',$post_id);
+
+
+		$id_produto = $produto['value'];
+		$nome_produto = $produto['label'];
+
+
+
+		$clientes = get_users(
+			array(
+				'role' => 'customer',
+				'meta_query' => array(
+					array(
+						'key' => 'produto',
+						'value' => $id_produto,
+						'compare' => '='
+					)
+					
+				)
+			)
+		);
+
+
+
+
+
+		foreach ($clientes as $key => $user) {
+			$id_cliente = $user->ID;
+
+			//$whats_cliente = get_field('numero_de_whatsapp', 'user_'.$id_cliente);
+			//Recupera os dados do cliente
+			$nome = $user->display_name;
+			// Email do cliente
+			$email_cliente = $user->user_email;
+
+			$link_pedido = "http://apiwhatsapp.local/?autoriza=S&postid=$post_id&cliente=$id_cliente&produto=$id_produto";
+			
+			$msg = "Olá *$nome* estou te mandando essa mensagem para te lembrar que acabou de sair o $produto fresquinho aqui na padaria. Caso queira que eu peço para o motoboy enviar até sua casa, clique no link abaixo. Abraços. <a href='$link_pedido'>Clique aqui para fazer seu pedido</a>";
+			
+			wp_mail($email_cliente, "Acaou de sair o $nome_produto Fresquinho", $msg);
+			
+			echo "Mensagem Enviada";
+		}
+	}
+
+
+}
+add_action('pedidos_padaria', 'pedidos_padaria');
+
+
+//Funçaõ para salvar no banco quando o cliente solicitar o pedido.
+function valida_pedido_init(){
+	if($_GET['autoriza'] == "S" and $_GET['cliente'] != "" and $_GET['produto'] != ""){
+		$id_cliente = $_GET['cliente'];
+		$produto = $_GET['produto'];
+		$post_id = $_GET['postid'];
+
+
+			// Create post object
+		$my_post = array(
+		'post_title'    => wp_strip_all_tags("Pedido Gerado Cliente $id_cliente"),
+		'post_status'   => 'publish',
+		'post_type' => 'pedidos_padaria',
+		);
+		
+
+		  // Insert the post into the database
+		  $id_post = wp_insert_post( $my_post );
+
+		  update_field('cliente', $id_cliente, $id_post);
+		  update_field('produto', $produto, $id_post);
+		  update_field('numero_do_pedido', $post_id, $id_post);
+		  
+	
+	}
+}
+add_action('init', 'valida_pedido_init');
