@@ -1,0 +1,158 @@
+
+add_action('acf/save_post', 'cst_check_post_title', 20);
+function cst_check_post_title($post_id)
+{
+
+    // Medida de segurança, se um post não tiver um ID vinculado ele não ira disparar
+    if (!is_numeric($post_id)) {
+        return;
+    }
+    $post_type = get_post_type($post_id);
+
+    //Só vai disparar o post se o post type for igual a whatsapp_marketing ou o que você definir
+    if ($post_type == 'whatsapp_marketing') {
+
+        $segmentacao = get_field('segmentacao_produtos', $post_id);
+        $mensagem = get_field('mensagem_personalizada_whatsapp', $post_id);
+
+        $clientes = get_users(
+            array(
+                'role' => 'customer',
+                'meta_query' => array(
+                    array(
+                        'key' => 'auth_whatsapp_ofertas',
+                        'value' => "S",
+                        'compare' => '=',
+                    ),
+
+                ),
+            )
+        );
+
+        $apresentacao = get_field('mensagem_personalizada_whatsapp', $post_id);
+        $msg_despedida = get_field('mensagem_despedida', $post_id);
+
+        $total_clientes_campanha = count($clientes);
+
+        if ($segmentacao == "manual") {
+            $produtos_selecionados = get_field('selecao_manual_de_produtos', $post_id);
+
+            $query_args = array(
+                'post_type' => 'product',
+                'post__in' => $produtos_selecionados,
+                'posts_per_page' => 5,
+                'post_status' => 'publish',
+
+            );
+
+        } elseif ($segmentacao == "categoria") {
+            $produtos_selecionados = get_field('selecione_uma_categoria', $post_id);
+
+            $query_args = array(
+                'post_type' => 'product',
+                'posts_per_page' => 5,
+                'post_status' => 'publish',
+                'tax_query' => array(array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id', // can be 'term_id', 'slug' or 'name'
+                    'terms' => $produtos_selecionados,
+                )),
+
+            );
+
+        } elseif ($segmentacao == "prod_promocao") {
+
+            $query_args = array(
+                'post_type' => 'product',
+                'posts_per_page' => 5,
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array( // Simple products type
+                        'key' => '_sale_price',
+                        'value' => 0,
+                        'compare' => '>',
+                        'type' => 'numeric',
+                    ),
+                    array( // Variable products type
+                        'key' => '_min_variation_sale_price',
+                        'value' => 0,
+                        'compare' => '>',
+                        'type' => 'numeric',
+                    ),
+                ),
+            );
+
+        } elseif ($segmentacao == "destaques") {
+
+            // The tax query
+            $tax_query[] = array(
+                'taxonomy' => 'product_visibility',
+                'field' => 'name',
+                'terms' => 'featured',
+                'operator' => 'IN', // or 'NOT IN' to exclude feature products
+            );
+
+// The query
+            $query_args = new WP_Query(array(
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'ignore_sticky_posts' => 1,
+                'posts_per_page' => 5,
+                'tax_query' => $tax_query, // <===
+            ));
+        } elseif ($segmentacao == "novos") {
+            $query_args = new WP_Query(array(
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'posts_per_page' => 5,
+                'orderby' => 'date',
+                'order' => 'DESC',
+            ));
+        }
+
+        $produtos = get_posts($query_args);
+
+        foreach ($produtos as $key => $value) {
+            $product = wc_get_product($value->ID);
+
+            $lista[] = array(
+                'nome_produto' => $value->post_title,
+                'preco' => "R$" . $product->get_regular_price(),
+                'url' => $product->get_permalink(),
+            );
+
+        }
+
+        foreach ($lista as $key => $value) {
+            $titulo = $value['nome_produto'];
+            $preco = $value['preco'];
+            $url = $value['url'];
+            $text .= "\r\n*$titulo* esta saindo *$preco*, você pode conferir ele no link $url  \r\n";
+        }
+
+        foreach ($clientes as $key => $cliente) {
+            $whatsapp_cliente = get_field('numero_de_whatsapp', 'user_' . $cliente->ID);
+            $email = $cliente->user_email;
+            $nome = $cliente->display_name;
+            $msg_whats = strip_tags($apresentacao . $text . "\r\n\r\n" . "$msg_despedida");
+
+            wp_mail( $email, "Olá $nome Veja o que acabou de chegar", $msg_whats );
+
+        }
+
+        // Formatando menssagem
+        //$apimsgCliente = "Ola, *Admin* O Cliente *" . $first_name . "* Acabou de finalizar a compra. O número do pedido é *#$order_id* \r\n \r\n Parabéns boas vendas";
+
+        //Aqui vc pode colocar o código
+
+        //Armazena quantos clientes receberam a campanha
+        update_field('total_de_clientes_que_receberam_a_mensagem', $total_clientes_campanha, $post_id);
+
+        //Armazena o status da campanha
+        update_field('campanha_enviada_com_sucesso', "Campanha Enviada com sucesso", $post_id);
+
+    } else {
+
+    }
+
+}
